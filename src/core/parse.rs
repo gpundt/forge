@@ -1,12 +1,8 @@
-use clap::Error;
 use indexmap::IndexSet;
 use log::{debug, error, info};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
-use std::fmt::format;
 use std::fs;
-use std::ops::Index;
-use std::path::Path;
 
 struct ForgeFile {
     configuration: Config,
