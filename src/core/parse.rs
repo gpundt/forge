@@ -1,7 +1,10 @@
 use clap::Error;
 use indexmap::IndexSet;
 use log::{debug, error, info};
+use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
+use std::fs;
+use std::ops::Index;
 use std::path::Path;
 
 struct ForgeFile {
@@ -20,6 +23,7 @@ impl ForgeFile {
     }
 }
 
+#[derive(Debug, Deserialize)]
 struct Config {
     default_task: String,
     shell: String,
@@ -38,6 +42,7 @@ impl Config {
     }
 }
 
+#[derive(Debug, Deserialize)]
 struct Task {
     description: String,
     command: String,
@@ -73,13 +78,30 @@ impl Task {
     }
 }
 
-// pub fn parse_forgefile(filepath: String) -> Result<ForgeFile, Error> {
-//     let path = Path::new(&filepath);
-// }
+pub fn parse_forgefile(filepath: String) -> Result<ForgeFile, String> {
+    let contents = fs::read_to_string(filepath)?;
+    let config: Config = match toml::from_str(&contents) {
+        Ok(config) => config,
+        Err(e) => {
+            return Err(format!(
+                "Failed to parse Forgefile Config: {}",
+                e.to_string()
+            ));
+        }
+    };
 
-// fn parse_forgefile_config(content: String) -> Result<Config, Error> {
+    let tasks: IndexSet<Task> = match parse_forgefile_tasks(contents) {
+        Ok(hashset) => hashset,
+        Err(e) => {
+            return Err(format!(
+                "Failed to parse Forgefile Tasks: {}",
+                e.to_string(),
+            ));
+        }
+    };
 
-// }
+    Ok(ForgeFile::new(config, tasks, filepath))
+}
 
 // fn parse_forgefile_tasks(content: String) -> Result<HashSet<Task>, Error> {
 

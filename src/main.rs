@@ -5,6 +5,8 @@ use core::{arguments::Args, filepath, logging};
 use log::{debug, error, info};
 use std::process::exit;
 
+use crate::core::parse;
+
 fn main() {
     let args: Args = Args::parse();
     logging::_set_log_level(args.debug);
@@ -19,5 +21,13 @@ fn main() {
             exit(1);
         }
     }
+
+    let forgefile = match parse::parse_forgefile(args.forge_file) {
+        Ok(forgefile_struct) => forgefile_struct,
+        Err(e) => {
+            error!("{}", e);
+            exit(1);
+        }
+    };
     ()
 }
