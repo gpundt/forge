@@ -13,7 +13,7 @@ pub struct Args {
     pub forge_file: String,
 
     /// Test the forge file's workflow, but don't execute any tasks
-    #[arg(short, long, default_value_t = false)]
+    #[arg(long, default_value_t = false)]
     pub dry_run: bool,
 
     /// Validate the forge file's syntax and formatting
