@@ -3,6 +3,7 @@ use indexmap::IndexSet;
 use log::{debug, error, info};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
+use std::fmt::format;
 use std::fs;
 use std::ops::Index;
 use std::path::Path;
@@ -79,7 +80,17 @@ impl Task {
 }
 
 pub fn parse_forgefile(filepath: String) -> Result<ForgeFile, String> {
-    let contents = fs::read_to_string(filepath)?;
+    let contents: String = match fs::read_to_string(filepath) {
+        Ok(text) => text,
+        Err(e) => {
+            return Err(format!(
+                "Failed to read file contents of {}: {}",
+                filepath,
+                e.to_string(),
+            ));
+        }
+    };
+
     let config: Config = match toml::from_str(&contents) {
         Ok(config) => config,
         Err(e) => {
