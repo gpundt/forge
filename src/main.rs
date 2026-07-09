@@ -12,6 +12,7 @@ use logging::set_log_level;
 use log::{debug, error, info};
 use std::process::exit;
 
+/// Entrypoint
 fn main() {
     let args: Args = Args::parse();
     set_log_level(args.debug);

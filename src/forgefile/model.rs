@@ -3,12 +3,15 @@ use indexmap::IndexMap;
 use serde::Deserialize;
 use std::collections::HashMap;
 
+// ──── ForgeFile ──────────────────────────────────────────────────────────
+/// Struct to hold parsed Forgefile contents
 pub struct ForgeFile {
     pub configuration: Config,
     pub tasks: IndexMap<String, Task>,
     pub filepath: String,
 }
 
+/// Function to initialize a new ForgeFile struct
 impl ForgeFile {
     pub fn new(configuration: Config, tasks: IndexMap<String, Task>, filepath: String) -> Self {
         Self {
@@ -18,6 +21,8 @@ impl ForgeFile {
         }
     }
 }
+
+/// Function to print out the contents of a ForgeFile struct
 impl fmt::Display for ForgeFile {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -28,6 +33,8 @@ impl fmt::Display for ForgeFile {
     }
 }
 
+// ──── Config ─────────────────────────────────────────────────────────────
+/// Struct to hold parsed Forgefile config contents
 #[derive(Deserialize)]
 pub struct Config {
     pub default_task: String,
@@ -37,6 +44,8 @@ pub struct Config {
     #[serde(default)]
     pub stop_on_failure: bool,
 }
+
+/// Function to initialize a new Forgefile Config struct
 impl Config {
     pub fn new(
         default_task: String,
@@ -52,6 +61,8 @@ impl Config {
         }
     }
 }
+
+/// Function to print out the contents of a Forgefile Config struct
 impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -62,6 +73,7 @@ impl fmt::Display for Config {
     }
 }
 
+// ──── ForgeFileRaw ───────────────────────────────────────────────────────
 // Mirrors the top-level shape of the TOML file: [config] and [task.*]
 #[derive(Deserialize)]
 pub struct ForgeFileRaw {
@@ -73,6 +85,8 @@ impl fmt::Display for ForgeFileRaw {
     }
 }
 
+// ──── Task ───────────────────────────────────────────────────────────────
+/// Struct to hold parsed Forgefile task contents
 #[derive(Debug, Deserialize, Clone)]
 pub struct Task {
     #[serde(skip)]
@@ -89,6 +103,8 @@ pub struct Task {
     #[serde(default)]
     pub ignore_fail: bool,
 }
+
+/// Function to initialize a new Forgefile Task struct
 impl Task {
     pub fn new(
         name: String,
@@ -114,6 +130,8 @@ impl Task {
         }
     }
 }
+
+/// Function to print out the contents of a Forgefile Task
 impl fmt::Display for Task {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
