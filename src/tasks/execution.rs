@@ -1,5 +1,6 @@
 use crate::forgefile::{Config, Task};
 
+use std::collections::HashMap;
 use std::env;
 
 use log::{debug, error, info, warn};
@@ -11,21 +12,20 @@ use std::process::exit;
 /// config - Forgefile's populated Config struct
 /// forgefile_task - Individual task struct
 pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
-    debug!("{:}", forgefile_task);
-    let command_str = format!("{} -c {}", &config.shell, forgefile_task.command,);
-    info!("{}", command_str);
+    // Set owned task variables
+    let command: String = forgefile_task.command.clone();
+    let env: HashMap<String, String> = forgefile_task.env.clone();
+    let ignore_fail: bool = forgefile_task.ignore_fail.clone();
 
-    // Set local ignore_fail variable
-    let ignore_fail = forgefile_task.ignore_fail.clone();
+    let command_str = format!("{} -c {}", &config.shell, forgefile_task.command,);
+    debug!("{:}", forgefile_task);
+    info!("{}", command_str);
 
     // Set local working_dir variable
     let working_dir: String = match forgefile_task.working_dir.as_str() {
         "." => {
-            let cwd = env::current_dir().unwrap();
-            cwd.into_os_string()
-                .into_string()
-                .map_err(|_| "Directory path contains invalud UTF-8 data")
-                .unwrap()
+            let current_dir_path = env::current_dir().unwrap();
+            current_dir_path.to_string_lossy().into_owned()
         }
         _other => forgefile_task.working_dir,
     };
@@ -33,8 +33,8 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
     // Execute task command and collect output
     let output = match Command::new(&config.shell)
         .arg("-c")
-        .arg(forgefile_task.command)
-        .envs(&forgefile_task.env)
+        .arg(&command)
+        .envs(&env)
         .current_dir(working_dir)
         .output()
     {
