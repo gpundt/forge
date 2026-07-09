@@ -45,29 +45,12 @@ pub struct Config {
     pub stop_on_failure: bool,
 }
 
-/// Function to initialize a new Forgefile Config struct
-impl Config {
-    pub fn new(
-        default_task: String,
-        shell: String,
-        env_file: String,
-        stop_on_failure: bool,
-    ) -> Self {
-        Self {
-            default_task,
-            shell,
-            env_file,
-            stop_on_failure,
-        }
-    }
-}
-
 /// Function to print out the contents of a Forgefile Config struct
 impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "\nConfig:\n\tDefault Task: {}\n\tShell: {}\n\tEnv File: {}\n\tStop on Failure: {}\n",
+            "Config:\n\tDefault Task: {}\n\tShell: {}\n\tEnv File: {}\n\tStop on Failure: {}\n",
             self.default_task, self.shell, self.env_file, self.stop_on_failure,
         )
     }
@@ -104,39 +87,12 @@ pub struct Task {
     pub ignore_fail: bool,
 }
 
-/// Function to initialize a new Forgefile Task struct
-impl Task {
-    pub fn new(
-        name: String,
-        description: String,
-        command: String,
-        depends_on: Vec<String>,
-        env: HashMap<String, String>,
-        working_dir: String,
-        confirm: bool,
-        timeout: u32,
-        ignore_fail: bool,
-    ) -> Self {
-        Self {
-            name,
-            description,
-            command,
-            depends_on,
-            env,
-            working_dir,
-            confirm,
-            timeout,
-            ignore_fail,
-        }
-    }
-}
-
 /// Function to print out the contents of a Forgefile Task
 impl fmt::Display for Task {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "\nTask Name: {}\n\tDescription: {}\n\tCommand: {}\n\tDepends On: {:?}\n\tEnv: {:?}\n\tWorking Dir: {}\n\tConfirm: {}\n\tTimeout: {}\n\tIgnore Fail: {}\n",
+            "task.{}\n\tDescription: {}\n\tCommand: {}\n\tDepends On: {:?}\n\tEnv: {:?}\n\tWorking Dir: {}\n\tConfirm: {}\n\tTimeout: {}\n\tIgnore Fail: {}\n",
             self.name,
             self.description,
             self.command,

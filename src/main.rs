@@ -2,12 +2,14 @@ mod cli;
 mod forgefile;
 mod fs;
 mod logging;
+mod tasks;
 
 use clap::Parser;
 use cli::Args;
 use forgefile::parser::parse_forgefile;
 use fs::verify_forgefile_exists;
 use logging::set_log_level;
+use tasks::execution::execute_task;
 
 use log::{debug, error, info};
 use std::process::exit;
@@ -16,9 +18,6 @@ use std::process::exit;
 fn main() {
     let args: Args = Args::parse();
     set_log_level(args.debug);
-
-    debug!("{:<20}{}", "Forgefile:", args.forgefile);
-    debug!("{:<20}{}", "Debug:", args.debug);
 
     match verify_forgefile_exists(&args.forgefile) {
         Ok(_) => debug!("Using Forgefile: {}", args.forgefile),
@@ -35,7 +34,18 @@ fn main() {
             exit(1);
         }
     };
-    debug!("Forgefile successfully parsed:\n{}", forgefile);
-
-    ()
+    debug!("Forgefile successfully parsed!");
+    debug!("{}", forgefile.configuration);
+    for (_, value) in forgefile.tasks {
+        let _ = match execute_task(value) {
+            Ok(msg) => {
+                info!("{}", msg);
+                msg
+            }
+            Err(e) => {
+                error!("{}", e.to_string());
+                e.to_string()
+            }
+        };
+    }
 }
