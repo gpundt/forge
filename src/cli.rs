@@ -10,7 +10,7 @@ pub struct Args {
     /// Target URL to spider and scrape
     #[arg(short, long)]
     #[arg(default_value_t = String::from("./forge.toml"))]
-    pub forge_file: String,
+    pub forgefile: String,
 
     /// Test the forge file's workflow, but don't execute any tasks
     #[arg(long, default_value_t = false)]

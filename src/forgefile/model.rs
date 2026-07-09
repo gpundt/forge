@@ -1,0 +1,133 @@
+use core::fmt;
+use indexmap::IndexMap;
+use serde::Deserialize;
+use std::collections::HashMap;
+
+pub struct ForgeFile {
+    pub configuration: Config,
+    pub tasks: IndexMap<String, Task>,
+    pub filepath: String,
+}
+
+impl ForgeFile {
+    pub fn new(configuration: Config, tasks: IndexMap<String, Task>, filepath: String) -> Self {
+        Self {
+            configuration,
+            tasks,
+            filepath,
+        }
+    }
+}
+impl fmt::Display for ForgeFile {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}\n{}\nTasks: {:?}",
+            self.filepath, self.configuration, self.tasks,
+        )
+    }
+}
+
+#[derive(Deserialize)]
+pub struct Config {
+    pub default_task: String,
+    pub shell: String,
+    #[serde(default)]
+    pub env_file: String,
+    #[serde(default)]
+    pub stop_on_failure: bool,
+}
+impl Config {
+    pub fn new(
+        default_task: String,
+        shell: String,
+        env_file: String,
+        stop_on_failure: bool,
+    ) -> Self {
+        Self {
+            default_task,
+            shell,
+            env_file,
+            stop_on_failure,
+        }
+    }
+}
+impl fmt::Display for Config {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "\nConfig:\n\tDefault Task: {}\n\tShell: {}\n\tEnv File: {}\n\tStop on Failure: {}\n",
+            self.default_task, self.shell, self.env_file, self.stop_on_failure,
+        )
+    }
+}
+
+// Mirrors the top-level shape of the TOML file: [config] and [task.*]
+#[derive(Deserialize)]
+pub struct ForgeFileRaw {
+    pub config: Config,
+}
+impl fmt::Display for ForgeFileRaw {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Config: {}", self.config,)
+    }
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Task {
+    #[serde(skip)]
+    pub name: String,
+    pub description: String,
+    pub command: String,
+    #[serde(default)]
+    pub depends_on: Vec<String>,
+    #[serde(default)]
+    pub env: HashMap<String, String>,
+    pub working_dir: String,
+    pub confirm: bool,
+    pub timeout: u32,
+    #[serde(default)]
+    pub ignore_fail: bool,
+}
+impl Task {
+    pub fn new(
+        name: String,
+        description: String,
+        command: String,
+        depends_on: Vec<String>,
+        env: HashMap<String, String>,
+        working_dir: String,
+        confirm: bool,
+        timeout: u32,
+        ignore_fail: bool,
+    ) -> Self {
+        Self {
+            name,
+            description,
+            command,
+            depends_on,
+            env,
+            working_dir,
+            confirm,
+            timeout,
+            ignore_fail,
+        }
+    }
+}
+impl fmt::Display for Task {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "\nTask Name: {}\n\tDescription: {}\n\tCommand: {}\n\tDepends On: {:?}\n\tEnv: {:?}\n\tWorking Dir: {}\n\tConfirm: {}\n\tTimeout: {}\n\tIgnore Fail: {}\n",
+            self.name,
+            self.description,
+            self.command,
+            self.depends_on,
+            self.env,
+            self.working_dir,
+            self.confirm,
+            self.timeout,
+            self.ignore_fail,
+        )
+    }
+}
