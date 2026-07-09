@@ -6,6 +6,7 @@ mod tasks;
 
 use clap::Parser;
 use cli::Args;
+use forgefile::ForgeFile;
 use forgefile::parser::parse_forgefile;
 use fs::verify_forgefile_exists;
 use logging::set_log_level;
@@ -27,7 +28,7 @@ fn main() {
         }
     }
 
-    let forgefile = match parse_forgefile(args.forgefile) {
+    let forgefile: ForgeFile = match parse_forgefile(args.forgefile) {
         Ok(forgefile_struct) => forgefile_struct,
         Err(e) => {
             error!("{}", e);
