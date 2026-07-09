@@ -37,7 +37,7 @@ fn main() {
     debug!("Forgefile successfully parsed!");
     debug!("{}", forgefile.configuration);
     for (_, value) in forgefile.tasks {
-        let _ = match execute_task(value) {
+        let _ = match execute_task(&forgefile.configuration, value) {
             Ok(msg) => {
                 info!("{}", msg);
                 msg
