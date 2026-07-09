@@ -1,7 +1,6 @@
 # Things To Do
 
 1) Confirm Functionality
-    - If 'confirm = true' in Forgefile, prompt user before executing task
     - If no confirm, default is false
 
 2) Working Directory Default
