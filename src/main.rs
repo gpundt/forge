@@ -34,19 +34,11 @@ fn main() {
             exit(1);
         }
     };
+
     debug!("Forgefile successfully parsed!");
     debug!("{}", forgefile.configuration);
     for (task_name, value) in forgefile.tasks {
         info!("Task: {}", task_name);
-        let _ = match execute_task(&forgefile.configuration, value) {
-            Ok(msg) => {
-                info!("{}", msg);
-                msg
-            }
-            Err(msg) => {
-                error!("{}", msg);
-                exit(1);
-            }
-        };
+        execute_task(&forgefile.configuration, value);
     }
 }

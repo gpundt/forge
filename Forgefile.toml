@@ -9,7 +9,7 @@ command = "echo 'Hello, World!'"
 working_dir = "."
 confirm = true
 timeout = 300
-ignore_fail = false
+ignore_fail = true
 
 [task.whoami]
 description = "Another basic task to print who I am"
@@ -17,4 +17,4 @@ command = "whoami"
 working_dir = "."
 confirm = true
 timeout = 300
-ignore_fail = true
+ignore_fail = false

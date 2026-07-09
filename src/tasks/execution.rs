@@ -2,27 +2,35 @@ use crate::forgefile::{Config, Task};
 
 use std::env;
 
-use clap::builder::Str;
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 use std::process::Command;
+use std::process::exit;
 
-pub fn execute_task(config: &Config, forgefile_task: Task) -> Result<String, String> {
+/// Function to execute an individual task's command
+///
+/// config - Forgefile's populated Config struct
+/// forgefile_task - Individual task struct
+pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
     debug!("{:}", forgefile_task);
     let command_str = format!("{} -c {}", &config.shell, forgefile_task.command,);
     info!("{}", command_str);
 
+    // Set local ignore_fail variable
     let ignore_fail = forgefile_task.ignore_fail.clone();
 
+    // Set local working_dir variable
     let working_dir: String = match forgefile_task.working_dir.as_str() {
         "." => {
             let cwd = env::current_dir().unwrap();
             cwd.into_os_string()
                 .into_string()
-                .map_err(|_| "Directory path contains invalud UTF-8 data")?
+                .map_err(|_| "Directory path contains invalud UTF-8 data")
+                .unwrap()
         }
         _other => forgefile_task.working_dir,
     };
 
+    // Execute task command and collect output
     let output = match Command::new(&config.shell)
         .arg("-c")
         .arg(forgefile_task.command)
@@ -33,26 +41,24 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> Result<String, Str
         Ok(o) => o,
         Err(e) => {
             if ignore_fail {
-                return Ok(format!("STDERR: {}", e.to_string()));
+                warn!("STDERR: {}", e.to_string());
+                return ();
             } else {
-                return Err(format!("STDERR: {}", e.to_string()));
+                error!("STDERR: {}", e.to_string());
+                exit(1);
             }
         }
     };
 
+    // Process output
     if output.status.success() {
-        return Ok(format!("{}", String::from_utf8_lossy(&output.stdout),));
+        info!("STDOUT: {}", String::from_utf8_lossy(&output.stdout));
     } else {
         if ignore_fail {
-            return Ok(format!(
-                "STDERR: {}",
-                String::from_utf8_lossy(&output.stderr)
-            ));
+            warn!("STDERR: {}", String::from_utf8_lossy(&output.stderr))
         } else {
-            return Err(format!(
-                "STDERR: {}",
-                String::from_utf8_lossy(&output.stderr)
-            ));
+            error!("STDERR: {}", String::from_utf8_lossy(&output.stderr))
         }
     }
+    ()
 }
