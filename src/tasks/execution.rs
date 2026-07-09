@@ -1,4 +1,5 @@
 use crate::forgefile::{Config, Task};
+use std::io::{self, Write};
 
 use std::collections::HashMap;
 use std::env;
@@ -15,6 +16,7 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
     // Set owned task variables
     let command: String = forgefile_task.command.clone();
     let env: HashMap<String, String> = forgefile_task.env.clone();
+    let confirm: bool = forgefile_task.confirm.clone();
     let ignore_fail: bool = forgefile_task.ignore_fail.clone();
 
     let command_str = format!("{} -c {}", &config.shell, forgefile_task.command,);
@@ -30,6 +32,26 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
         _other => forgefile_task.working_dir,
     };
 
+    if confirm {
+        info!("Proceed with executing: '{}'?", command);
+        print!("(y/n) >>>   ");
+        io::stdout().flush().unwrap();
+        let mut input = String::new();
+
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read line");
+        if input.trim() == "N" || input.trim() == "n" {
+            if !ignore_fail {
+                error!("Closing...");
+                exit(1);
+            } else {
+                warn!("Skipping...\n");
+                return ();
+            }
+        }
+    }
+
     // Execute task command and collect output
     let output = match Command::new(&config.shell)
         .arg("-c")
@@ -41,7 +63,7 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
         Ok(o) => o,
         Err(e) => {
             if ignore_fail {
-                warn!("STDERR: {}", e.to_string());
+                warn!("STDERR: {}\n", e.to_string());
                 return ();
             } else {
                 error!("STDERR: {}", e.to_string());
@@ -52,12 +74,13 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
 
     // Process output
     if output.status.success() {
-        info!("STDOUT: {}", String::from_utf8_lossy(&output.stdout));
+        info!("STDOUT: {}\n", String::from_utf8_lossy(&output.stdout));
     } else {
         if ignore_fail {
-            warn!("STDERR: {}", String::from_utf8_lossy(&output.stderr))
+            warn!("STDERR: {}\n", String::from_utf8_lossy(&output.stderr))
         } else {
-            error!("STDERR: {}", String::from_utf8_lossy(&output.stderr))
+            error!("STDERR: {}", String::from_utf8_lossy(&output.stderr));
+            exit(1);
         }
     }
     ()

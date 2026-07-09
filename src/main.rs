@@ -42,4 +42,6 @@ fn main() {
         info!("Task: {}", task_name);
         execute_task(&forgefile.configuration, value);
     }
+
+    info!("Finished");
 }
