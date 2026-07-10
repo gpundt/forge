@@ -3,6 +3,11 @@ use indexmap::IndexMap;
 use serde::Deserialize;
 use std::collections::HashMap;
 
+/// Function to return default value for config booleans
+fn default_boolean() -> bool {
+    false
+}
+
 // ──── ForgeFile ──────────────────────────────────────────────────────────
 /// Struct to hold parsed Forgefile contents
 pub struct ForgeFile {
@@ -34,14 +39,20 @@ impl fmt::Display for ForgeFile {
 }
 
 // ──── Config ─────────────────────────────────────────────────────────────
+/// Function to return default value for config 'default_shell' key
+fn default_shell() -> String {
+    "/bin/bash".to_string()
+}
+
 /// Struct to hold parsed Forgefile config contents
 #[derive(Deserialize)]
 pub struct Config {
     pub default_task: String,
+    #[serde(default = "default_shell")]
     pub shell: String,
     #[serde(default)]
     pub env_file: String,
-    #[serde(default)]
+    #[serde(default = "default_boolean")]
     pub stop_on_failure: bool,
 }
 
@@ -69,6 +80,14 @@ impl fmt::Display for ForgeFileRaw {
 }
 
 // ──── Task ───────────────────────────────────────────────────────────────
+fn default_working_dir() -> String {
+    ".".to_string()
+}
+
+fn default_timeout() -> u32 {
+    30
+}
+
 /// Struct to hold parsed Forgefile task contents
 #[derive(Debug, Deserialize, Clone)]
 pub struct Task {
@@ -80,10 +99,13 @@ pub struct Task {
     pub depends_on: Vec<String>,
     #[serde(default)]
     pub env: HashMap<String, String>,
+    #[serde(default = "default_working_dir")]
     pub working_dir: String,
+    #[serde(default = "default_boolean")]
     pub confirm: bool,
+    #[serde(default = "default_timeout")]
     pub timeout: u32,
-    #[serde(default)]
+    #[serde(default = "default_boolean")]
     pub ignore_fail: bool,
 }
 

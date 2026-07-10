@@ -1,20 +1,28 @@
 [config]
 default_task = "hello_world"
-shell = "/usr/bin/zsh"
+shell = "powershell.exe"
 stop_on_failure = true
 
 [task.hello_world]
 description = "Basic task to echo 'Hello, World!'"
 command = "echo 'Hello, World!'"
-working_dir = "."
-confirm = true
-timeout = 300
+working_dir = "C:/Users/pundt/git/forge/"
 ignore_fail = true
+
+[task.pwd]
+description = "Test working_dir default"
+command = "pwd"
+confirm = true
 
 [task.whoami]
 description = "Another basic task to print who I am"
 command = "whoami"
-working_dir = "."
+working_dir = "C:/Users/pundt/git/forge"
+
+[task.ping]
+description = "Ping google"
+command = "ping 8.8.8.8"
+working_dir = "C:/Users/pundt/git/forge"
 confirm = true
 timeout = 300
-ignore_fail = false
+ignore_fail = true

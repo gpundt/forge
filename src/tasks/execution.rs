@@ -65,6 +65,12 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
     {
         Ok(c) => c,
         Err(e) => {
+            if ignore_fail {
+                warn!("Failed to spawn child process: {}", e.to_string());
+                println!("\n");
+                return;
+            }
+
             error!("Failed to spawn child process: {}", e.to_string());
             exit(1);
         }
@@ -78,6 +84,12 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
             match line {
                 Ok(text) => println!("{}", text),
                 Err(e) => {
+                    if ignore_fail {
+                        warn!("Failed to read stdout: {}", e.to_string());
+                        println!("\n");
+                        return;
+                    }
+
                     error!("Failed to read stdout: {}", e.to_string());
                     exit(1);
                 }
@@ -90,6 +102,11 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
     let status = match child.wait() {
         Ok(s) => s,
         Err(e) => {
+            if ignore_fail {
+                warn!("Failed to wait on child process: {}", e.to_string());
+                println!("\n");
+                return;
+            }
             error!("Failed to wait on child process: {}", e.to_string());
             exit(1);
         }
