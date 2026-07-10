@@ -95,7 +95,6 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
                 }
             }
         }
-        println!("\n")
     }
 
     // Wait for child process to finish before return
@@ -112,5 +111,6 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
         }
     };
     debug!("Process exited with status: {}", status);
+    println!("\n");
     ()
 }
