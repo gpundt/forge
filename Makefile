@@ -1,7 +1,7 @@
 # ──── Global Variables ────────────────────────────────────────────────────
 SHELL := /usr/bin/zsh
 CURRENT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-BUILD_OUTPUT_FILE := $(CURRENT_DIR)target/debug/forge
+BUILD_OUTPUT_FILE := $(CURRENT_DIR)target/release/forge
 BUILD_DST_FILE := /usr/bin/forge
 
 FORGE_ETC_DIR := /etc/forge
@@ -35,7 +35,7 @@ prep_dirs:
 
 build_forge:					## Builds the Forge binary and moves it to destination
 	$(call start_step_message,"Building '$(BUILD_DST_FILE)'")
-	@cargo build
+	@cargo build --release
 	@sudo mv -f $(BUILD_OUTPUT_FILE) $(BUILD_DST_FILE)
 	@rehash
 	$(call successful)
