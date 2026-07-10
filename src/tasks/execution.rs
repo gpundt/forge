@@ -5,8 +5,9 @@ use std::collections::HashMap;
 use std::env;
 
 use log::{debug, error, info, warn};
-use std::process::Command;
+use std::io::{BufRead, BufReader};
 use std::process::exit;
+use std::process::{Command, Stdio};
 
 /// Function to execute an individual task's command
 ///
@@ -32,6 +33,7 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
         _other => forgefile_task.working_dir,
     };
 
+    // If 'confirm = true' is in Forgefile, prompt user before execution
     if confirm {
         info!("Proceed with executing: '{}'?", command);
         print!("(y/n) >>>   ");
@@ -52,36 +54,46 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
         }
     }
 
-    // Execute task command and collect output
-    let output = match Command::new(&config.shell)
+    // Create new child process using config and Forgefile settings
+    let mut child = match Command::new(&config.shell)
         .arg("-c")
         .arg(&command)
         .envs(&env)
         .current_dir(working_dir)
-        .output()
+        .stdout(Stdio::piped())
+        .spawn()
     {
-        Ok(o) => o,
+        Ok(c) => c,
         Err(e) => {
-            if ignore_fail {
-                warn!("STDERR: {}\n", e.to_string());
-                return ();
-            } else {
-                error!("STDERR: {}", e.to_string());
-                exit(1);
-            }
+            error!("Failed to spawn child process: {}", e.to_string());
+            exit(1);
         }
     };
 
-    // Process output
-    if output.status.success() {
-        info!("STDOUT: {}\n", String::from_utf8_lossy(&output.stdout));
-    } else {
-        if ignore_fail {
-            warn!("STDERR: {}\n", String::from_utf8_lossy(&output.stderr))
-        } else {
-            error!("STDERR: {}", String::from_utf8_lossy(&output.stderr));
+    // If child process has stdout, capture it and stream it as output
+    if let Some(stdout) = child.stdout.take() {
+        let reader = BufReader::new(stdout);
+
+        for line in reader.lines() {
+            match line {
+                Ok(text) => println!("{}", text),
+                Err(e) => {
+                    error!("Failed to read stdout: {}", e.to_string());
+                    exit(1);
+                }
+            }
+        }
+        println!("\n")
+    }
+
+    // Wait for child process to finish before return
+    let status = match child.wait() {
+        Ok(s) => s,
+        Err(e) => {
+            error!("Failed to wait on child process: {}", e.to_string());
             exit(1);
         }
-    }
+    };
+    debug!("Process exited with status: {}", status);
     ()
 }
