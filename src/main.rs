@@ -8,7 +8,7 @@ use clap::Parser;
 use cli::Args;
 use forgefile::ForgeFile;
 use forgefile::parser::parse_forgefile;
-use fs::verify_forgefile_exists;
+use fs::verify_path_exists;
 use logging::set_log_level;
 use tasks::execution::execute_task;
 
@@ -20,7 +20,7 @@ fn main() {
     let args: Args = Args::parse();
     set_log_level(args.debug);
 
-    match verify_forgefile_exists(&args.forgefile) {
+    match verify_path_exists(&args.forgefile, true) {
         Ok(_) => debug!("Using Forgefile: {}", args.forgefile),
         Err(e) => {
             error!("{}", e);

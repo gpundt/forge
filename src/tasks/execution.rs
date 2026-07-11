@@ -1,4 +1,5 @@
 use crate::forgefile::{Config, Task};
+use crate::fs::verify_path_exists;
 use std::io::{self, Write};
 
 use std::collections::HashMap;
@@ -30,7 +31,22 @@ pub fn execute_task(config: &Config, forgefile_task: Task) -> () {
             let current_dir_path = env::current_dir().unwrap();
             current_dir_path.to_string_lossy().into_owned()
         }
-        _other => forgefile_task.working_dir,
+        _other => {
+            match verify_path_exists(&forgefile_task.working_dir, false) {
+                Ok(f) => f,
+                Err(e) => {
+                    if ignore_fail {
+                        warn!("{}", e);
+                        println!("\n");
+                        return;
+                    }
+
+                    error!("{}", e);
+                    exit(1);
+                }
+            }
+            forgefile_task.working_dir
+        }
     };
 
     // If 'confirm = true' is in Forgefile, prompt user before execution
