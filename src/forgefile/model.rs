@@ -52,8 +52,6 @@ pub struct Config {
     pub shell: String,
     #[serde(default)]
     pub env_file: String,
-    #[serde(default = "default_boolean")]
-    pub stop_on_failure: bool,
 }
 
 /// Function to print out the contents of a Forgefile Config struct
@@ -61,8 +59,8 @@ impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Config:\n\tDefault Task: {}\n\tShell: {}\n\tEnv File: {}\n\tStop on Failure: {}\n",
-            self.default_task, self.shell, self.env_file, self.stop_on_failure,
+            "Config:\n\tDefault Task: {}\n\tShell: {}\n\tEnv File: {}\n",
+            self.default_task, self.shell, self.env_file,
         )
     }
 }

@@ -32,7 +32,33 @@ Below outlines how to setup your Forgefile:
 
 ### Example
 
+```toml
+[config]
+default_task = "hello_world"
+shell = "/usr/bin/ssh"
 
+[task.hello_world]
+description = "Basic task to echo 'Hello, World!'"
+command = "echo 'Hello, World!'"
+ignore_fail = true
+
+[task.pwd]
+description = "Test working_dir default"
+command = "pwd"
+working_dir = "/etc/ssh
+
+[task.whoami]
+description = "Another basic task to print who I am"
+command = "whoami"
+
+[task.ping]
+description = "Ping google"
+command = "ping 8.8.8.8"
+working_dir = "/var/log"
+confirm = true
+timeout = 5
+ignore_fail = true
+```
 
 
 
@@ -40,18 +66,24 @@ Below outlines how to setup your Forgefile:
 
 #### Default Task
 
+This option describes the task to execute by default if no other task is specified.
 
+- Example: `default_task = "hello_world"`
+- Type: String
 
 #### Shell
 
+This option specifies the shell to use when executing each task command.
 
+- Example: `shell = "/bin/bash"`
+- Type: String
 
 #### Environment File
 
+This option specifies a `.env` environment variable to apply to every task.
 
-
-#### Stop on Failure
-
+- Example: `env_file = "/home/user/.env"`
+- Type: String
 
 
 ### Task Options
