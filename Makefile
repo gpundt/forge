@@ -4,10 +4,6 @@ CURRENT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 BUILD_OUTPUT_FILE := $(CURRENT_DIR)target/release/forge
 BUILD_DST_FILE := /usr/bin/forge
 
-FORGE_ETC_DIR := /etc/forge
-FORGE_CONFIG_SRC := $(CURRENT_DIR)forge.conf
-FORGE_CONFIG_DST := $(FORGE_ETC_DIR)/forge.conf
-
 # ──── Colors and Helpers ──────────────────────────────────────────────────
 RED     := \033[0;31m
 GREEN   := \033[0;32m
@@ -29,8 +25,6 @@ endef
 all: prep_dirs build_forge
 
 prep_dirs:
-	@sudo mkdir -p $(FORGE_ETC_DIR)
-	@sudo cp $(FORGE_CONFIG_SRC) $(FORGE_CONFIG_DST)
 	@sudo rm -rf $(BUILD_DST_FILE)
 
 build_forge:					## Builds the Forge binary and moves it to destination
